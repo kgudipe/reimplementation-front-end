@@ -41,6 +41,9 @@ import ErrorPage from "./router/ErrorPage";
 import NotFound from "./router/NotFound";
 import ProtectedRoute from "./router/ProtectedRoute";
 import { ROLE } from "./utils/interfaces";
+import Duties from "./pages/Duties/Duties";
+import DutyEditor from "./pages/Duties/DutyEditor";
+
 function App() {
   const router = createBrowserRouter([
     {
@@ -215,6 +218,14 @@ function App() {
         {
           path: "email_the_author",
           element: <Email_the_author />,
+        },
+        {
+          path: "duties",
+          element: <ProtectedRoute element={<Duties />} leastPrivilegeRole={ROLE.TA} />,
+          children: [
+            { path: "new", element: <DutyEditor mode="create" /> },
+            { path: "edit/:id", element: <DutyEditor mode="update" /> },
+          ],
         },
         // Fixed the missing comma and added an opening curly brace
         {
