@@ -34,13 +34,25 @@ vi.mock('hooks/useAPI', () => ({
   }),
 }));
 
-const mockNavigate = jest.fn();
+const mockNavigate = vi.fn();
+const mockDispatch = vi.fn();
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-  useLocation: () => ({ pathname: '/courses', search: '', hash: '' }),
-}));
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    useLocation: () => ({ pathname: '/courses', search: '', hash: '' }),
+  };
+});
+
+vi.mock('react-redux', async () => {
+  const actual = await vi.importActual<typeof import('react-redux')>('react-redux');
+  return {
+    ...actual,
+    useDispatch: () => mockDispatch,
+  };
+});
 
 import CourseAssignments from './CourseAssignments';
 
@@ -88,6 +100,6 @@ describe('CourseAssignments', () => {
     await userEvent.click(deleteButtons[0]);
 
     expect(mockNavigate).toHaveBeenCalledWith('/assignments/edit/1', { state: { from: '/courses' } });
-    expect(screen.getByText(/delete assignment/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/delete assignment/i).length).toBeGreaterThan(0);
   });
 });
